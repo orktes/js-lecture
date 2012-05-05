@@ -1,0 +1,14 @@
+{
+    "name": "js-lecture"
+  , "version": "0.0.1"
+  , "description": "Example for a lecture about jQuery + Node + Socket.io"
+  , "keywords": []
+  , "author": "Jaakko Lukkari <jaakko.lukkari@gmail.com>"
+  , "dependencies": {
+        "express": "2.5.9"
+        ,"": ""
+    }
+  , "private": true
+  , "main": "index"
+  , "engines": { "node": "0.6.x" }
+}
