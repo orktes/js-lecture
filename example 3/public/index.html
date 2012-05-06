@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Canvas</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+
+        body {
+            padding-top: 60px;
+        }
+
+        #canvas-container {
+            border: 1px black solid;
+        }
+
+    </style>
+
+
+    <!-- jQuery is used as a query selector and for dom manipulation -->
+    <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+
+    <!-- Socket.IO server will automatically deliver a browser library in the following path -->
+    <script type="text/javascript" src="socket.io/socket.io.js"></script>
+
+    <!-- write.js contains the application specific code -->
+    <script type="text/javascript">
+        $(function () {
+            // This is executed after the DOM has fully loaded
+
+            // Connecting to our server
+            var socket = io.connect();
+
+            // Data element
+            var data = $('#data');
+
+            // Canvas element
+            var canvas = $('#canvas');
+
+            // Canvas context
+            var context = canvas[0].getContext('2d');
+
+             // Set the style properties.
+            context.fillStyle = '#ffffff';
+            context.strokeStyle = '#f00';
+            context.lineWidth = 4;
+
+            var draw = false;
+            var linePoints = [];
+            var lineBuffer = [];
+
+            function drawLine (points) {
+                context.beginPath();
+
+                var start = points.shift();
+                context.moveTo(start.x, start.y);
+
+                var point;
+                while (point = points.shift()) {
+                    context.lineTo(point.x, point.y);
+                }
+
+                context.stroke();
+                context.closePath();
+            }
+
+            // Lets listen to line events from the server
+            socket.on('line', function (points) {
+                if (draw) {
+                    lineBuffer.push(points);
+                } else {
+                    drawLine(points);
+                }
+
+            });
+
+            canvas.mousedown(function (e) {
+                draw = true;
+                context.beginPath();
+                context.moveTo(e.offsetX, e.offsetY); // give the (x,y) coordinates
+            });
+
+            canvas.mouseup(function () {
+                draw = false;
+                context.closePath();
+
+                socket.emit('line', linePoints);
+                linePoints = [];
+
+                // Empty out line buffer
+                var line;
+                while (line = lineBuffer.shift()) {
+                    drawLine(line);
+                }
+
+            });
+
+            canvas.mousemove(function (e) {
+                if (draw) {
+                    var x = e.offsetX;
+                    var y = e.offsetY;
+
+                    context.lineTo(x, y);
+                    context.stroke();
+                    linePoints.push({x: x, y: y});
+                }
+            });
+
+
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <div id="canvas-container">
+        <canvas id="canvas" width="938" height="600"></canvas>
+    </div>
+</div>
+</body>
+</html>

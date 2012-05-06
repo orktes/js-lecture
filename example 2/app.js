@@ -17,8 +17,8 @@ var app = express.createServer();
 // Addding a middleware for static files
 app.use(express.static(__dirname + '/public'));
 
-// Binding the http server to port 3000
-app.listen(3000);
+// Binding the http server to port 3001
+app.listen(3001);
 
 // Telling Socket.io to listen connection to the http-server
 var io =  socketio.listen(app);

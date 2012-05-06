@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>KeyPress</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+
+        body {
+            padding-top: 60px;
+        }
+
+        #input {
+            width: 10px;
+        }
+
+    </style>
+
+
+    <!-- jQuery is used as a query selector and for dom manipulation -->
+    <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+
+    <!-- Socket.IO server will automatically deliver a browser library in the following path -->
+    <script type="text/javascript" src="socket.io/socket.io.js"></script>
+
+    <!-- write.js contains the application specific code -->
+    <script type="text/javascript">
+        $(function () {
+            // This is executed after the DOM has fully loaded
+
+            // Connecting to our server
+            var socket = io.connect();
+
+            // Data element
+            var data = $('#data');
+
+            // Input element
+            var input = $('#input');
+
+            // Lets listen to keypress events from the server
+            socket.on('keypress', function (keyCode, charCode) {
+
+                var char = String.fromCharCode(charCode);
+
+                // If keycode is 13 (Enter) add <br />
+                if (keyCode == 13) {
+                    char = "<br />";
+                }
+
+                // Add char to end of content
+                data.html(data.html() + char);
+            });
+
+            // Listen to keypresses from the text input
+            input.keypress(function (e) {
+
+                // Send the keyCode and charCode to server
+                socket.emit('keypress', e.keyCode, e.charCode);
+
+                // Prevent the key from displaying in the text input
+                e.preventDefault();
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <input id="input" type="text" value=""/>
+
+    <div id="data"></div>
+</div>
+</body>
+</html>
