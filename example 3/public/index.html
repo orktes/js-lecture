@@ -51,6 +51,9 @@
             var lineBuffer = [];
 
             function drawLine (points) {
+                if (points.length == 0) {
+                    return;
+                }
                 context.beginPath();
 
                 var start = points.shift();
@@ -76,12 +79,14 @@
             });
 
             canvas.mousedown(function (e) {
+                console.log("mousedown");
                 draw = true;
                 context.beginPath();
                 context.moveTo(e.offsetX, e.offsetY); // give the (x,y) coordinates
             });
 
             canvas.mouseup(function () {
+                console.log("mouseup");
                 draw = false;
                 context.closePath();
 
@@ -98,12 +103,18 @@
 
             canvas.mousemove(function (e) {
                 if (draw) {
-                    var x = e.offsetX;
-                    var y = e.offsetY;
+
+                    var offset = canvas.position();
+
+                    var x = e.offsetX || (e.clientX - offset.left);
+                    var y = e.offsetY || (e.clientY - offset.top);
+
+                    console.log(x, y);
 
                     context.lineTo(x, y);
                     context.stroke();
                     linePoints.push({x: x, y: y});
+
                 }
             });
 
