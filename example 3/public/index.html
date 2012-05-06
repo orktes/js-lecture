@@ -6,11 +6,6 @@
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <style>
-
-        body {
-            padding-top: 60px;
-        }
-
         #canvas-container {
             border: 1px black solid;
         }
@@ -41,16 +36,16 @@
             // Canvas context
             var context = canvas[0].getContext('2d');
 
-             // Set the style properties.
+            // Set the style properties.
             context.fillStyle = '#ffffff';
-            context.strokeStyle = '#f00';
+            context.strokeStyle = '#000000';
             context.lineWidth = 4;
 
             var draw = false;
             var linePoints = [];
             var lineBuffer = [];
 
-            function drawLine (points) {
+            function drawLine(points) {
                 if (points.length == 0) {
                     return;
                 }
@@ -78,15 +73,14 @@
 
             });
 
-            canvas.mousedown(function (e) {
-                console.log("mousedown");
+
+            function startDraw(x, y) {
                 draw = true;
                 context.beginPath();
-                context.moveTo(e.offsetX, e.offsetY); // give the (x,y) coordinates
-            });
+                context.moveTo(x, y);
+            }
 
-            canvas.mouseup(function () {
-                console.log("mouseup");
+            function endDraw() {
                 draw = false;
                 context.closePath();
 
@@ -99,34 +93,76 @@
                     drawLine(line);
                 }
 
+            }
+
+            function moveDraw(x, y) {
+                context.lineTo(x, y);
+                context.stroke();
+                linePoints.push({x: x, y: y});
+            }
+
+            canvas.mousedown(function (e) {
+                startDraw(e.offsetX, e.offsetY);
+            });
+
+            canvas.mouseup(function (e) {
+                endDraw();
             });
 
             canvas.mousemove(function (e) {
                 if (draw) {
-
                     var offset = canvas.position();
-
                     var x = e.offsetX || (e.clientX - offset.left);
                     var y = e.offsetY || (e.clientY - offset.top);
-
-                    console.log(x, y);
-
-                    context.lineTo(x, y);
-                    context.stroke();
-                    linePoints.push({x: x, y: y});
-
+                    moveDraw(x, y)
                 }
             });
 
 
+            // IPAD STUFF
+
+            canvas[0].addEventListener('touchstart', function(e) {
+                var offset = canvas.position();
+                var x = e.targetTouches[0].pageX - offset.left;
+                var y = e.targetTouches[0].pageY - offset.top;
+                startDraw(x, y);
+            }, false);
+
+            canvas[0].addEventListener('touchend', function(e) {
+                var offset = canvas.position();
+                var x = e.targetTouches[0].pageX - offset.left;
+                var y = e.targetTouches[0].pageY - offset.top;
+                endDraw();
+            }, false);
+
+            canvas[0].addEventListener('touchmove', function(e) {
+                var offset = canvas.position();
+                var x = e.targetTouches[0].pageX - offset.left;
+                var y = e.targetTouches[0].pageY - offset.top;
+                moveDraw(x, y);
+            }, false);
+
+
+            function resizeCanvas() {
+                canvas[0].width = $(document).width() - 30;
+                canvas[0].height = $(document).height() - 30;
+            }
+
+            // When window is resized the canvas should be fitted to screen
+            $(window).resize(resizeCanvas);
+
+            resizeCanvas();
         });
+
+
+
     </script>
 </head>
 <body>
-<div class="container">
+
     <div id="canvas-container">
-        <canvas id="canvas" width="938" height="600"></canvas>
+        <canvas id="canvas"></canvas>
     </div>
-</div>
+
 </body>
 </html>
