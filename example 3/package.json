@@ -6,7 +6,7 @@
   , "author": "Jaakko Lukkari <jaakko.lukkari@gmail.com>"
   , "dependencies": {
         "express": "2.5.9"
-        ,"": ""
+        ,"socket.io": "0.9.6"
     }
   , "private": true
   , "main": "index"
